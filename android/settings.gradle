@@ -1,0 +1,3 @@
+rootProject.name = 'ideaboxReactNative'
+
+include ':app'
