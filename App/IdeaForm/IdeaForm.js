@@ -17,7 +17,6 @@ export default class IdeaForm extends Component<Props> {
 
   handleSubmit = () => {
     const { title, body } = this.state;
-    console.log(this.state);
 
     if ( title !== '' || body !== '') {
       const idea = {

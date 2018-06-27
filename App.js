@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 
 import IdeaForm from './App/IdeaForm/IdeaForm';
+import IdeaContainer from './App/IdeaContainer/IdeaContainer';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' +
@@ -20,14 +21,72 @@ export default class App extends Component<Props> {
   constructor() {
     super();
     this.state = {
-      ideas: []
+      ideas: [],
+      currentId: 0
     }
   }
 
   addIdea = (idea) => {
-    const ideas = [...this.state.ideas, idea];
+    const ideas = [...this.state.ideas, {...idea, id: this.state.currentId}];
+    const currentId = this.state.currentId + 1;
+    this.setState({ ideas, currentId });
+  }
+
+  deleteIdea = (id) => {
+    const oldIdeas = this.state.ideas;
+
+    const ideas = oldIdeas.filter(idea => idea.id !== id);
 
     this.setState({ ideas });
+  }
+
+  upVoteIdea = (id) => {
+    const oldIdeas = this.state.ideas;
+
+    const ideas = oldIdeas.map(idea => {
+      if (idea.id === id) {
+        const newIdea = this.handleUpVote(idea);
+        return newIdea;
+      } else {
+        return idea
+      }
+    });
+
+    this.setState({ ideas })
+  }
+
+  downVoteIdea = (id) => {
+    const oldIdeas = this.state.ideas;
+
+    const ideas = oldIdeas.map(idea => {
+      if (idea.id === id) {
+        const newIdea = this.handleDownVote(idea);
+        return newIdea;
+      } else {
+        return idea
+      }
+    });
+
+    this.setState({ ideas })
+  }
+
+  handleUpVote = idea => {
+    if (idea.qualityNum <= 1) {
+      idea.qualityNum++;
+      return idea;
+    } else {
+      return idea;
+    }
+
+  }
+
+  handleDownVote = idea => {
+    if (idea.qualityNum >= 1) {
+      idea.qualityNum--;
+      return idea;
+    } else {
+      return idea
+    }
   }
 
   render() {
@@ -44,12 +103,11 @@ export default class App extends Component<Props> {
           </View>
           <IdeaForm addIdea={this.addIdea}/>
         </View>
-        <Text style={styles.instructions}>
-          To get started, edit App.js
-        </Text>
-        <Text style={styles.instructions}>
-          {instructions}
-        </Text>
+        <IdeaContainer 
+          ideas={this.state.ideas}
+          deleteIdea={this.deleteIdea}
+          upVoteIdea={this.upVoteIdea}
+          downVoteIdea={this.downVoteIdea}/>
       </View>
     );
   }
@@ -90,10 +148,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     margin: 0,
     color: '#6D6E71'
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  }
 });
